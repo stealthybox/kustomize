@@ -118,9 +118,7 @@ metadata:
 `)
 }
 
-func TestGeneratorOverrideDataWithBinaryDataInvalidAtKubeAPI(t *testing.T) {
-	// the resulting ConfigMap will fail Kubernetes API validation:
-	//   The ConfigMap "test-configmap-b6h9d5bfmt" is invalid: data[CHANGING]: Invalid value: "CHANGING": duplicate of key present in binaryData
+func TestGeneratorOverrideDataWithBinaryData(t *testing.T) {
 	th := kusttest_test.MakeHarness(t)
 	th.WriteK("base", `
 configMapGenerator:
@@ -159,17 +157,14 @@ binaryData:
     hlbGxv/2hlbGxv/2hlbGxv/2hlbGxv
 data:
   BASE: red
-  CHANGING: data-before
   OVERLAY: blue
 kind: ConfigMap
 metadata:
-  name: test-configmap-b6h9d5bfmt
+  name: test-configmap-7d7tc96hhk
 `)
 }
 
-func TestGeneratorOverrideBinaryDataWithDataInvalidAtKubeAPI(t *testing.T) {
-	// the resulting ConfigMap will fail Kubernetes API validation:
-	//   The ConfigMap "test-configmap-kt6d6mk694" is invalid: data[CHANGING]: Invalid value: "CHANGING": duplicate of key present in binaryData
+func TestGeneratorOverrideBinaryDataWithData(t *testing.T) {
 	th := kusttest_test.MakeHarness(t)
 	th.WriteK("base", `
 configMapGenerator:
@@ -200,19 +195,13 @@ OVERLAY=blue
 	m := th.Run("overlay", th.MakeDefaultOptions())
 	th.AssertActualEqualsExpected(m, `
 apiVersion: v1
-binaryData:
-  CHANGING: |
-    /2hlbGxv/2hlbGxv/2hlbGxv/2hlbGxv/2hlbGxv/2hlbGxv/2hlbGxv/2hlbGxv/2hlbG
-    xv/2hlbGxv/2hlbGxv/2hlbGxv/2hlbGxv/2hlbGxv/2hlbGxv/2hlbGxv/2hlbGxv/2hl
-    bGxv/2hlbGxv/2hlbGxv/2hlbGxv/2hlbGxv/2hlbGxv/2hlbGxv/2hlbGxv/2hlbGxv/2
-    hlbGxv/2hlbGxv/2hlbGxv/2hlbGxv
 data:
   BASE: red
   CHANGING: data-after
   OVERLAY: blue
 kind: ConfigMap
 metadata:
-  name: test-configmap-kt6d6mk694
+  name: test-configmap-6kt4k5b8cf
 `)
 }
 

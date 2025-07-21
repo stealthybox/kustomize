@@ -202,9 +202,7 @@ type: Opaque
 `)
 }
 
-func TestSecretGeneratorOverrideDataWithStringDataWorksAtKubeAPI(t *testing.T) {
-	// The resulting Secret will have a duplicate key in both data and stringData
-	// The stringData override will work, because the kube API considers stringData authoritative and write-only
+func TestSecretGeneratorOverrideDataWithStringData(t *testing.T) {
 	th := kusttest_test.MakeHarness(t)
 	th.WriteK("base", `
 secretGenerator:
@@ -236,10 +234,9 @@ OVERLAY=blue
 apiVersion: v1
 data:
   BASE: cmVk
-  CHANGING: ZGF0YS1iZWZvcmU=
 kind: Secret
 metadata:
-  name: test-secret-c4g4kdc558
+  name: test-secret-27cgc8d5f9
 stringData:
   CHANGING: stringData-after
   OVERLAY: blue
@@ -247,9 +244,7 @@ type: Opaque
 `)
 }
 
-func TestSecretGeneratorOverrideStringDataWithDataSilentlyFailsAtKubeAPI(t *testing.T) {
-	// The resulting Secret will have a duplicate key in both data and stringData
-	// The data override will fail, because the kube API considers the older value in stringData authoritative and write-only
+func TestSecretGeneratorOverrideStringDataWithData(t *testing.T) {
 	th := kusttest_test.MakeHarness(t)
 	th.WriteK("base", `
 secretGenerator:
@@ -285,10 +280,9 @@ data:
   OVERLAY: Ymx1ZQ==
 kind: Secret
 metadata:
-  name: test-secret-b65ktgckfh
+  name: test-secret-dm4hm4t2hb
 stringData:
   BASE: red
-  CHANGING: stringData-before
 type: Opaque
 `)
 }

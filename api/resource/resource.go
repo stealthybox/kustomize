@@ -190,15 +190,24 @@ func (r *Resource) copyKustomizeSpecificFields(other *Resource) {
 }
 
 func (r *Resource) MergeDataMapFrom(o *Resource) {
-	r.SetDataMap(mergeStringMaps(o.GetDataMap(), r.GetDataMap()))
+	r.SetDataMap(
+		mergeStringMaps(
+			pruneStringMap(o.GetDataMap(), r.GetBinaryDataMap(), r.GetStringDataMap()),
+			r.GetDataMap()))
 }
 
 func (r *Resource) MergeBinaryDataMapFrom(o *Resource) {
-	r.SetBinaryDataMap(mergeStringMaps(o.GetBinaryDataMap(), r.GetBinaryDataMap()))
+	r.SetBinaryDataMap(
+		mergeStringMaps(
+			pruneStringMap(o.GetBinaryDataMap(), r.GetDataMap()),
+			r.GetBinaryDataMap()))
 }
 
 func (r *Resource) MergeStringDataMapFrom(o *Resource) {
-	r.SetStringDataMap(mergeStringMaps(o.GetStringDataMap(), r.GetStringDataMap()))
+	r.SetStringDataMap(
+		mergeStringMaps(
+			pruneStringMap(o.GetStringDataMap(), r.GetDataMap()),
+			r.GetStringDataMap()))
 }
 
 func (r *Resource) ErrIfNotEquals(o *Resource) error {
@@ -546,6 +555,23 @@ func mergeStringMapsWithBuildAnnotations(maps ...map[string]string) map[string]s
 			}
 		}
 		delete(result, BuildAnnotations[i])
+	}
+	return result
+}
+
+// pruneStringMap returns a copy of orig with any shared keys from maps[] removed
+func pruneStringMap(orig map[string]string, maps ...map[string]string) map[string]string {
+	if orig == nil {
+		return nil
+	}
+	result := map[string]string{}
+	for key, value := range orig {
+		result[key] = value
+	}
+	for _, m := range maps {
+		for key := range m {
+			delete(result, key)
+		}
 	}
 	return result
 }
